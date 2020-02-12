@@ -39,10 +39,8 @@ class Download extends Observable implements Runnable {
         this.url=url;
         size=-1;
         downloaded=0;
-        
         status=DOWNLOADING;
         
-        download();
         
     }
     
@@ -58,10 +56,18 @@ class Download extends Observable implements Runnable {
     public int getStatus(){
         return status;
     }
-    public void resume(){status=DOWNLOADING;}
-    public void cancel(){status=CANCELLED;}
-    public void pause(){status=PAUSED;}
-    public void error(){status=ERROR;}
+    public void resume(){
+        status=DOWNLOADING;
+    }
+    public void cancel(){
+        status=CANCELLED;
+    }
+    public void pause(){
+        status=PAUSED;
+    }
+    public void error(){
+        status=ERROR;
+    }
     
     public void download(){
         new Thread(this).start();
@@ -81,11 +87,56 @@ class Download extends Observable implements Runnable {
             if(connection.getResponseCode()/100!=2){
                 error();
             }
-        } catch (IOException ex) {
-            Logger.getLogger(Download.class.getName()).log(Level.SEVERE, null, ex);
+            if(connection.getContentLength()<1){
+                error();
+            }
+            if(size==-1){
+                size=connection.getContentLength();
+            }
+            file=new RandomAccessFile(getFileName(url), "rw");
+            file.seek(downloaded);
+            
+            stream=connection.getInputStream();
+            while(status==DOWNLOADING){
+                byte buffer[];
+                if(size-downloaded>MAX_BUFFER_SIZE){
+                    buffer=new byte[MAX_BUFFER_SIZE];
+                }
+                else{
+                    buffer=new byte[size-downloaded];
+                }
+                
+                int read =stream.read(buffer);
+                if(read==-1){
+                    break;
+                }
+                
+                file.write(buffer, 0, read);
+                downloaded=downloaded+read;
+            }
+            //downloading has finished
+            if(status==DOWNLOADING){
+                status=COMPLETE;
+            }
+            
+        } catch (Exception e) {
+            error();
+        }
+        finally{
+            //close file
+            if(file!=null){
+                try{
+                    file.close();
+                }
+                catch(Exception e){}
+            }
         }
         
     
+    }
+
+    private String getFileName(URL url) {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
    
     
