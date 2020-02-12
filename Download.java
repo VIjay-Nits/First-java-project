@@ -39,8 +39,10 @@ class Download extends Observable implements Runnable {
         this.url=url;
         size=-1;
         downloaded=0;
+        
         status=DOWNLOADING;
         
+        download();
         
     }
     
