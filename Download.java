@@ -7,7 +7,7 @@ package downloadmanager;
 
 /**
  *
- * @author USER
+ * @author Vijay
  */
 import java.io.IOException;
 import java.io.RandomAccessFile;
@@ -40,7 +40,7 @@ class Download extends Observable implements Runnable {
         size=-1;
         downloaded=0;
         status=DOWNLOADING;
-        
+        download();
         
     }
     
@@ -58,15 +58,26 @@ class Download extends Observable implements Runnable {
     }
     public void resume(){
         status=DOWNLOADING;
+        stateChanged();
+        download();
     }
     public void cancel(){
         status=CANCELLED;
+        stateChanged();
     }
     public void pause(){
         status=PAUSED;
+        stateChanged();
     }
     public void error(){
         status=ERROR;
+        stateChanged();
+    }
+    
+    private void stateChanged(){
+        setChanged();
+        notifyObservers();
+        
     }
     
     public void download(){
@@ -130,18 +141,19 @@ class Download extends Observable implements Runnable {
                 }
                 catch(Exception e){}
             }
+            
+            if(stream!=null){
+                try{
+                    stream.close();
+                }
+                catch(Exception e){}
+            }
         }
-        
-    
     }
 
     private String getFileName(URL url) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        String fileName=url.getFile();
+        return fileName.substring(fileName.lastIndexOf('/')+1);
     }
    
-    
-    
-    
-    
-    
 }
