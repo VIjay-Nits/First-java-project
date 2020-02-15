@@ -9,14 +9,10 @@ package downloadmanager;
  *
  * @author Vijay
  */
-import java.io.IOException;
-import java.io.RandomAccessFile;
-import java.util.Observable;
-import java.net.URL;
-import java.io.InputStream;
-import java.net.HttpURLConnection;
-import java.util.logging.Level;
-import java.util.logging.Logger;
+import java.io.*;
+import java.util.*;
+import java.net.*;
+
 
 class Download extends Observable implements Runnable {
 
@@ -51,7 +47,7 @@ class Download extends Observable implements Runnable {
         return this.size;
     }
     public float getProgress(){
-        return ((float)this.downloaded/(float)this.size)*100 ;
+        return ((float)downloaded/size)*100 ;
     }
     public int getStatus(){
         return status;
@@ -85,6 +81,7 @@ class Download extends Observable implements Runnable {
     }
     
 
+    
     @Override
     public void run() {
         RandomAccessFile file=null;
@@ -124,10 +121,12 @@ class Download extends Observable implements Runnable {
                 
                 file.write(buffer, 0, read);
                 downloaded=downloaded+read;
+                stateChanged();
             }
             //downloading has finished
             if(status==DOWNLOADING){
                 status=COMPLETE;
+                stateChanged();
             }
             
         } catch (Exception e) {
