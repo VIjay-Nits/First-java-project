@@ -5,16 +5,16 @@
  */
 package downloadmanager;
 
-import java.awt.Component;
-import javax.swing.JProgressBar;
-import javax.swing.JTable;
-import javax.swing.table.TableCellRenderer;
+import java.awt.*;
+import javax.swing.*;
+import javax.swing.table.*;
+
 
 /**
  *
  * @author Vijay
  */
-public class ProgressRenderer extends JProgressBar implements TableCellRenderer{
+class ProgressRenderer extends JProgressBar implements TableCellRenderer{
 
     public ProgressRenderer(int min, int max) {
         super(min, max);
